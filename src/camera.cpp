@@ -199,6 +199,8 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
 
     pkt_cnt = pkt_cnt + 1;
   }
+
+  camera.CS_HIGH();
   
   return pkt_cnt;
 }
