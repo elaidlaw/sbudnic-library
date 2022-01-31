@@ -76,68 +76,106 @@ int Camera::disable() {
   digitalWrite(powerPin, HIGH);
 }
 
-//Function which takes in a buffer address and reads bytes from the camera buffer into it.
-//returns: the number of bits read to the buffer.
-size_t Camera::populate_buffer(uint8_t *b)
-{
+// //Function which takes in a buffer address and reads bytes from the camera buffer into it.
+// //returns: the number of bits read to the buffer.
+// size_t Camera::populate_buffer(uint8_t *b)
+// {
+//   uint8_t temp = 0, temp_last = 0;
+//   uint32_t length = 0;
+//   bool is_header = false;
+//   length = camera.read_fifo_length();
+
+//   camera.CS_LOW();
+//   camera.set_fifo_burst();
+//   temp = SPI.transfer(0x00);
+//   length--;
+
+//   int ptr = 0;
+
+//   while ( length-- )
+//   {
+//     temp_last = temp;
+//     temp =  SPI.transfer(0x00);
+//     if (is_header == true)
+//     {
+//       b[ptr] = temp;
+//       ptr = ptr + 1;
+//     }
+//     else if ((temp == 0xD8) & (temp_last == 0xFF))
+//     {
+//       is_header = true;
+//       b[ptr] = temp_last;
+//       b[ptr+1] = temp;
+
+//       //shouldnt matter...
+//       ptr = ptr + 2;
+//     }
+//     if ( (temp == 0xD9) && (temp_last == 0xFF) )
+//     break;
+//     delayMicroseconds(15);
+//   }
+//   camera.CS_HIGH();
+//   is_header = false;
+//   return (ptr);
+// }
+
+//Function which takes in a pointer to the full buffer and packetizes/writes them to a buffer.
+//returns: number of packets made
+
+//TODO: length argument is not needed most likely
+int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
+
+///////////////////////
+  uint8_t full_buffer[128] = {0};
   uint8_t temp = 0, temp_last = 0;
-  uint32_t length = 0;
   bool is_header = false;
-  length = camera.read_fifo_length();
 
   camera.CS_LOW();
   camera.set_fifo_burst();
   temp = SPI.transfer(0x00);
-  length--;
+///////////////////////
 
-  int ptr = 0;
 
-  while ( length-- )
-  {
-    temp_last = temp;
-    temp =  SPI.transfer(0x00);
-    if (is_header == true)
-    {
-      b[ptr] = temp;
-      ptr = ptr + 1;
-    }
-    else if ((temp == 0xD8) & (temp_last == 0xFF))
-    {
-      is_header = true;
-      b[ptr] = temp_last;
-      b[ptr+1] = temp;
 
-      //shouldnt matter...
-      ptr = ptr + 2;
-    }
-    if ( (temp == 0xD9) && (temp_last == 0xFF) )
-    break;
-    delayMicroseconds(15);
-  }
-  camera.CS_HIGH();
-  is_header = false;
-  return (ptr);
-}
-
-//Function which takes in a pointer to the full buffer and packetizes/writes them to a buffer.
-//returns: number of packets made
-int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
-
-  int ptr = 0;
+  // int ptr = 0;
   int c;
   int pkt_cnt = 0;
   int output_position = 0;
       
   while(1){
     while((c = ssdv_enc_get_packet(&ssdv)) == SSDV_FEED_ME){
-      int r = 128;
-      if(length - ptr < 128) {
-        r = length-ptr;
+
+      //////////////////////
+      //Get the next <=128 bytes from the photo
+      int ptr = 0;
+      while(ptr < 128){
+        temp_last = temp;
+        temp =  SPI.transfer(0x00);
+        if (is_header == true){
+          full_buffer[ptr] = temp;
+          ptr = ptr + 1;
+        }
+        else if ((temp == 0xD8) & (temp_last == 0xFF)){
+          is_header = true;
+          full_buffer[ptr] = temp_last;
+          full_buffer[ptr+1] = temp;
+
+          ptr = ptr + 2;
+        }
+        if ((temp == 0xD9) && (temp_last == 0xFF)) {
+          break;
+        }
+        delayMicroseconds(15);
       }
+
+
+      //////////////////////  
+
+
+      
       
       //encode the next chunk of data
-      ssdv_enc_feed(&ssdv, &jpeg_buffer[ptr], r);
-      ptr = ptr + 128;
+      ssdv_enc_feed(&ssdv, full_buffer, ptr);
     }
         
     if(c == SSDV_EOI){
@@ -185,8 +223,8 @@ uint32_t Camera::takePicture() {
 
 //returns number of packets written
 int Camera::readData(uint8_t* data, size_t size) {
-  uint8_t full_buffer[jpegLen] = {0};
-  size_t l = populate_buffer(full_buffer);
+  // uint8_t full_buffer[jpegLen] = {0};
+  // size_t l = populate_buffer(full_buffer);
   //here, full_buffer has the entire jpeg image
   
   return transmit_packets(l, full_buffer, data);
