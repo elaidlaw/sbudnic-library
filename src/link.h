@@ -12,7 +12,8 @@ class LinkInterface {
     virtual int enable() = 0;
     virtual int disable() = 0;
     // transmit data using AX.25 over AFSK
-    virtual int transmit(char* data, uint16_t count) = 0;
+    virtual int transmit(char* data) = 0;
+    virtual int transmit(byte* data, uint16_t count) = 0;
     // receive for timeout milliseconds and return the received command
     // if there is one or 0x00 otherwise
     virtual char receive(long timeout) = 0;
@@ -29,7 +30,20 @@ class RFM96Link: public LinkInterface {
     ~RFM96Link(){}
     int enable();
     int disable();
-    int transmit(char* data, uint16_t size);
+    int transmit(char* data);
+    int transmit(byte* data, uint16_t count) {};
+    char receive(long timeout);
+};
+
+class RFM96LoRALink: public LinkInterface {
+
+  public:
+    RFM96LoRALink();
+    ~RFM96LoRALink(){}
+    int enable();
+    int disable();
+    int transmit(char* data);
+    int transmit(byte* data, uint16_t count);
     char receive(long timeout);
 };
 
@@ -39,7 +53,8 @@ class SerialLink: public LinkInterface {
     ~SerialLink(){}
     int enable();
     int disable();
-    int transmit(char* data, uint16_t size);
+    int transmit(char* data);
+    int transmit(byte* data, uint16_t count);
     char receive(long timeout);
 };
 

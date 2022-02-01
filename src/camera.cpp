@@ -23,9 +23,9 @@ ArduCAM camera(OV5642, CAM_CS_PIN);
 int Camera::enable() {
   //Mosfet open
   pinMode(powerPin, OUTPUT);
-  digitalWrite(powerPin, LOW);
+  digitalWrite(powerPin, HIGH);
 
-  delay(3000);
+  delay(500);
   Wire.begin();
 
   pinMode(CAM_CS_PIN, OUTPUT);
@@ -66,14 +66,15 @@ int Camera::enable() {
   delay(1000);
   camera.clear_fifo_flag();
   camera.write_reg(ARDUCHIP_FRAMES, 0x00);
-
-  Wire.begin();
   SBUDNIC_DEBUG_PRINTLN("Done enabling camera");
 }
 
 int Camera::disable() {
+  SBUDNIC_DEBUG_PRINTLN("Camera disable called");
   pinMode(powerPin, OUTPUT);
-  digitalWrite(powerPin, HIGH);
+  digitalWrite(powerPin, LOW);
+  digitalWrite(CAM_CS_PIN, HIGH);
+  SBUDNIC_DEBUG_PRINTLN("Done disabling camera");
 }
 
 // //Function which takes in a buffer address and reads bytes from the camera buffer into it.
@@ -183,6 +184,7 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
       break;
     } else if(c != SSDV_OK){
       //if something breaks
+      SBUDNIC_DEBUG_PRINTLN("Camera transmit packets error");
       return -1;
     }
         
@@ -201,6 +203,7 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
   }
 
   camera.CS_HIGH();
+  SBUDNIC_DEBUG_PRINTLN("Camera transmit packets done");
   
   return pkt_cnt;
 }
@@ -214,6 +217,8 @@ uint32_t Camera::takePicture() {
   delay(5000);
 
   uint32_t length = camera.read_fifo_length();
+  SBUDNIC_DEBUG_PRINTLN("Picture taken with length ");
+  SBUDNIC_DEBUG_PRINTLN(length);
   jpegLen = length;
   return length;
 }
@@ -224,10 +229,22 @@ uint32_t Camera::takePicture() {
 //TODO: use size to make sure the buffer is big enough to write all our packets in
 
 //returns number of packets written
-int Camera::readData(uint8_t* data, size_t size) {
-  // uint8_t full_buffer[jpegLen] = {0};
-  // size_t l = populate_buffer(full_buffer);
+int Camera::readData(uint8_t* data, size_t size, int photoId) {
+  uint8_t full_buffer[1] = {0};
+  size_t l = 0;
   //here, full_buffer has the entire jpeg image
+  char type = SSDV_TYPE_NORMAL;
+  int droptest = 0;
+  int verbose = 0;
+  int errors;
+  char callsign[] = "BROWNU";
+  int8_t quality = 4;
+
+  SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
+  
+  ssdv_enc_init(&ssdv, type, callsign, photoId, quality);
+  ssdv_enc_set_buffer(&ssdv, pkt);
+  SBUDNIC_DEBUG_PRINTLN("finished SSDV setup");
   
   return transmit_packets(l, full_buffer, data);
   //all the packets will be written to the 'data' buffer
@@ -240,19 +257,5 @@ Camera::Camera(uint16_t id) {
   } else {
     powerPin = CAM2_PWR_PIN;
   }
-
-  //Initialize ssdv object
-  char type = SSDV_TYPE_NORMAL;
-  int droptest = 0;
-  int verbose = 0;
-  int errors;
-  char callsign[] = "BROWNU";
-  uint8_t image_id = 0;
-  int8_t quality = 4;
-
-  SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
   
-  ssdv_enc_init(&ssdv, type, callsign, image_id, quality);
-  ssdv_enc_set_buffer(&ssdv, pkt);
-  SBUDNIC_DEBUG_PRINTLN("finished SSDV setup");
 }

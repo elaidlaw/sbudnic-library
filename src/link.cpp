@@ -34,10 +34,18 @@ int SerialLink::disable() {
   return 0;
 }
 
-int SerialLink::transmit(char* data, uint16_t size) {
+int SerialLink::transmit(char* data) {
   SBUDNIC_DEBUG_PRINTLN("beginning serial transmit");
   Serial.println(data);
   SBUDNIC_DEBUG_PRINTLN("serial println called");
+  SBUDNIC_DEBUG_PRINTLN("done with serial transmit");
+  return 0;
+}
+
+int SerialLink::transmit(byte* data, uint16_t count) {
+  SBUDNIC_DEBUG_PRINTLN("beginning serial transmit");
+  Serial.write(data, count);
+  SBUDNIC_DEBUG_PRINTLN("serial write called");
   SBUDNIC_DEBUG_PRINTLN("done with serial transmit");
   return 0;
 }
@@ -57,7 +65,7 @@ RFM96Link::RFM96Link() {
 
   pinMode(RFM96_PWR_PIN, OUTPUT);
 
-  digitalWrite(RFM96_PWR_PIN, HIGH);
+  digitalWrite(RFM96_PWR_PIN, LOW);
 }
 
 int RFM96Link::enable() {
@@ -87,7 +95,7 @@ int RFM96Link::disable() {
   return 0;
 }
 
-int RFM96Link::transmit(char* data, uint16_t size) {
+int RFM96Link::transmit(char* data) {
   SBUDNIC_DEBUG_PRINTLN("beginning RFM96 transmit");
   CHECK(ax25.transmit(data, CALL_SIGN));
   SBUDNIC_DEBUG_PRINTLN("RFM96 ax25 transmit called");
@@ -95,5 +103,58 @@ int RFM96Link::transmit(char* data, uint16_t size) {
 }
 
 char RFM96Link::receive(long timeout) {
+  return 0;
+}
+
+RFM96LoRALink::RFM96LoRALink() {
+
+  pinMode(RFM96_PWR_PIN, OUTPUT);
+
+  digitalWrite(RFM96_PWR_PIN, LOW);
+}
+
+int RFM96LoRALink::enable() {
+  SBUDNIC_DEBUG_PRINTLN("enabling RFM96");
+  digitalWrite(RFM96_PWR_PIN, HIGH);
+  delay(50);
+  SBUDNIC_DEBUG_PRINTLN("RFM96 power turned on");
+
+  SBUDNIC_DEBUG_PRINTLN("RFM96 object created");
+  
+  CHECK(radio.begin());
+  SBUDNIC_DEBUG_PRINTLN("RFM96 begin called");
+  CHECK(radio.setOutputPower(RADIO_RF_POWER));
+  SBUDNIC_DEBUG_PRINTLN("RFM96 setOutputPower called");
+  CHECK(radio.setFrequency(RADIO_DOWNLINK_FREQUENCY));
+  SBUDNIC_DEBUG_PRINTLN("RFM96 setFrequency called");
+  CHECK(radio.setCurrentLimit(140));
+  SBUDNIC_DEBUG_PRINTLN("RFM96 setCurrentLimit called");
+  SBUDNIC_DEBUG_PRINTLN("done enabling RFM96");
+  return 0;
+}
+
+int RFM96LoRALink::disable() {
+  SBUDNIC_DEBUG_PRINTLN("disabling RFM96");
+  digitalWrite(RFM96_PWR_PIN, LOW);
+  SBUDNIC_DEBUG_PRINTLN("RFM96 power turned off");
+  SBUDNIC_DEBUG_PRINTLN("done disabling RFM96");
+  return 0;
+}
+
+int RFM96LoRALink::transmit(char* data) {
+  SBUDNIC_DEBUG_PRINTLN("beginning RFM96 transmit");
+  CHECK(radio.transmit(data));
+  SBUDNIC_DEBUG_PRINTLN("RFM96 transmit called");
+  SBUDNIC_DEBUG_PRINTLN("done with RFM96 transmit");
+}
+
+int RFM96LoRALink::transmit(byte* data, uint16_t count) {
+  SBUDNIC_DEBUG_PRINTLN("beginning RFM96 transmit");
+  CHECK(radio.transmit(data, count));
+  SBUDNIC_DEBUG_PRINTLN("RFM96 transmit called");
+  SBUDNIC_DEBUG_PRINTLN("done with RFM96 transmit");
+}
+
+char RFM96LoRALink::receive(long timeout) {
   return 0;
 }

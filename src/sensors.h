@@ -1,6 +1,8 @@
 #ifndef SBUDNIC_SENSORS_H
 #define SBUDNIC_SENSORS_H
 
+#define MAXIMWIRE_EXTERNAL_PULLUP
+
 #include "pins.h"
 
 class SensorsInterface {

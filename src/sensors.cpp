@@ -27,9 +27,11 @@ float Sensors::readTempSensor(int id) {
   float temp = -1;
   switch(id) {
   case 0:
+    tempSensor0.Update(tempSensorBus);
     temp = tempSensor0.GetTemperature<float>(tempSensorBus);
     break;
   case 1:
+    tempSensor1.Update(tempSensorBus);
     temp = tempSensor1.GetTemperature<float>(tempSensorBus);
     break;
   }
