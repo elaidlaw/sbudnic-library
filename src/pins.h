@@ -20,7 +20,7 @@
 #define CAM_SCLK_PIN 13
 
 #define CAM1_CS_PIN 7
-#define CAM2_CS_PIN 9
+#define CAM2_CS_PIN 10
 
 // deployment pins
 #define AOCS_DEPLOY_PWR_PIN 9

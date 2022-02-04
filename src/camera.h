@@ -30,6 +30,7 @@ class Camera: public CameraInterface {
     int powerPin;
     int csPin;
     size_t jpegLen;
+    ArduCAM camera;
   public:
     Camera(uint16_t id);
     ~Camera(){};
