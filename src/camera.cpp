@@ -23,7 +23,7 @@ ArduCAM camera(OV5642, CAM_CS_PIN);
 int Camera::enable() {
   //Mosfet open
   pinMode(powerPin, OUTPUT);
-  digitalWrite(powerPin, HIGH);
+  digitalWrite(powerPin, LOW);
 
   delay(500);
   Wire.begin();
@@ -72,7 +72,7 @@ int Camera::enable() {
 int Camera::disable() {
   SBUDNIC_DEBUG_PRINTLN("Camera disable called");
   pinMode(powerPin, OUTPUT);
-  digitalWrite(powerPin, LOW);
+  digitalWrite(powerPin, HIGH);
   digitalWrite(CAM_CS_PIN, HIGH);
   SBUDNIC_DEBUG_PRINTLN("Done disabling camera");
 }
@@ -254,8 +254,11 @@ int Camera::readData(uint8_t* data, size_t size, int photoId) {
 Camera::Camera(uint16_t id) {
   if (id == 0) {
     powerPin = CAM1_PWR_PIN;
+    csPin = CAM1_CS_PIN;
   } else {
     powerPin = CAM2_PWR_PIN;
+    csPin = CAM2_CS_PIN;
   }
-  
+  pinMode(powerPin, OUTPUT);
+  digitalWrite(powerPin, HIGH);
 }

@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include <Adafruit_ADS1X15.h>
 #include <MaximWire.h>
+#include "buildopt.h"
 
 Adafruit_ADS1015 ads;
 MaximWire::Bus tempSensorBus(TEMP_SENSOR_PIN);
@@ -13,9 +14,11 @@ Sensors::Sensors() {
 }
 
 int Sensors::enable() {
+  SBUDNIC_DEBUG_PRINTLN("enabling sensors");
   //TODO Maybe change these for light vs temp...
   digitalWrite(SENSORS_PWR_PIN, LOW);
   ads.begin();
+  SBUDNIC_DEBUG_PRINTLN("enabled sensors");
 }
 
 int Sensors::disable() {
