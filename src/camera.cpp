@@ -18,25 +18,25 @@
 //TODO: ID (0-255) should change with each photo so we know which packets belong to which photo
 
 
-ArduCAM camera1(OV5642, CAM1_CS_PIN);
-ArduCAM camera2(OV5642, CAM2_CS_PIN);
+// ArduCAM cam1(OV5642, CAM1_CS_PIN);
+// ArduCAM cam2(OV5642, CAM2_CS_PIN);
 
 int Camera::enable() {
-  if(powerPin == CAM1_PWR_PIN){
-    camera = camera1;
-  }else{
-    camera = camera2;
-  }
   
   //Mosfet open
   pinMode(powerPin, OUTPUT);
-  digitalWrite(powerPin, HIGH);
-
-  delay(500);
-  Wire.begin();
+  digitalWrite(powerPin, LOW);
 
   pinMode(csPin, OUTPUT);
   digitalWrite(csPin, HIGH);
+
+  delay(500);
+  if(powerPin == CAM1_PWR_PIN){
+    camera = ArduCAM(OV5642, CAM1_CS_PIN);
+  }else{
+    camera = ArduCAM(OV5642, CAM2_CS_PIN);
+  }
+  Wire.begin();
   // initialize SPI:
   SPI.begin();
 
@@ -74,6 +74,7 @@ int Camera::enable() {
   camera.clear_fifo_flag();
   camera.write_reg(ARDUCHIP_FRAMES, 0x00);
   SBUDNIC_DEBUG_PRINTLN("Done enabling camera");
+  camera.clear_fifo_flag();
 }
 
 int Camera::disable() {
@@ -132,20 +133,20 @@ int Camera::disable() {
 
 //TODO: length argument is not needed most likely
 int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
-  if(powerPin == CAM1_PWR_PIN){
-    camera = camera1;
-  }else{
-    camera = camera2;
-  }
 ///////////////////////
   uint8_t full_buffer[128] = {0};
   uint8_t temp = 0, temp_last = 0;
   bool is_header = false;
 
+  SBUDNIC_DEBUG_PRINTLN("starting to read from camera buffer");
+
   camera.CS_LOW();
+  delay(100);
   camera.set_fifo_burst();
   temp = SPI.transfer(0x00);
 ///////////////////////
+
+  SBUDNIC_DEBUG_PRINTLN("starting ssdv encoding");
 
 
 
@@ -156,6 +157,7 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
       
   while(1){
     while((c = ssdv_enc_get_packet(&ssdv)) == SSDV_FEED_ME){
+      SBUDNIC_DEBUG_PRINTLN("ssdv encoding");
 
       //////////////////////
       //Get the next <=128 bytes from the photo
@@ -196,6 +198,7 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
     } else if(c != SSDV_OK){
       //if something breaks
       SBUDNIC_DEBUG_PRINTLN("Camera transmit packets error");
+      SBUDNIC_DEBUG_PRINTLN(c);
       return -1;
     }
         
@@ -214,6 +217,7 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
   }
 
   camera.CS_HIGH();
+  camera.clear_fifo_flag();
   SBUDNIC_DEBUG_PRINTLN("Camera transmit packets done");
   
   return pkt_cnt;
@@ -221,16 +225,11 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
 
 
 uint32_t Camera::takePicture() {
-  if(powerPin == CAM1_PWR_PIN){
-    camera = camera1;
-  }else{
-    camera = camera2;
-  }
   camera.flush_fifo();
   camera.clear_fifo_flag();
   camera.start_capture();
 
-  delay(5000);
+  while(!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK));
 
   uint32_t length = camera.read_fifo_length();
   SBUDNIC_DEBUG_PRINTLN("Picture taken with length ");
@@ -277,5 +276,7 @@ Camera::Camera(uint16_t id) {
     csPin = CAM2_CS_PIN;
   }
   pinMode(powerPin, OUTPUT);
-  // digitalWrite(powerPin, HIGH);
+  digitalWrite(powerPin, HIGH);
+  pinMode(csPin, OUTPUT);
+  digitalWrite(csPin, HIGH);
 }

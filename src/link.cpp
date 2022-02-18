@@ -111,6 +111,8 @@ RFM96LoRALink::RFM96LoRALink() {
   pinMode(RFM96_PWR_PIN, OUTPUT);
 
   digitalWrite(RFM96_PWR_PIN, LOW);
+  pinMode(RFM96_NSS_PIN, OUTPUT);
+  digitalWrite(RFM96_NSS_PIN, HIGH);
 }
 
 int RFM96LoRALink::enable() {
