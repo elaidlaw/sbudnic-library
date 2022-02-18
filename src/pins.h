@@ -10,6 +10,8 @@
 #define LIGHT_SENSOR_5_PIN A3
 
 // camera pins
+#define UNO_PWR_PIN 6
+
 #define CAM1_PWR_PIN 4
 #define CAM2_PWR_PIN 6
 
