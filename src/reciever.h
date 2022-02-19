@@ -25,6 +25,7 @@ class RecieverInterface {
     virtual int disable() = 0;
     virtual int read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) = 0;
     virtual uint8_t get_state() = 0;
+    virtual int get_output_pos() = 0;
     void recieve_data(int howMany);
     // virtual static void send_settings() = 0;
 };
@@ -68,6 +69,7 @@ class Reciever: public RecieverInterface {
     int disable();
     int read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer);
     uint8_t get_state();
+    int get_output_pos();
     static void recieve_data(int howMany);
     static void send_settings();
 };
