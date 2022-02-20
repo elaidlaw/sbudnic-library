@@ -16,14 +16,14 @@ Sensors::Sensors() {
 int Sensors::enable() {
   SBUDNIC_DEBUG_PRINTLN("enabling sensors");
   //TODO Maybe change these for light vs temp...
-  digitalWrite(SENSORS_PWR_PIN, LOW);
-  ads.begin();
+  digitalWrite(SENSORS_PWR_PIN, HIGH);
+  SBUDNIC_DEBUG_PRINTLN(ads.begin(0x48));
   SBUDNIC_DEBUG_PRINTLN("enabled sensors");
 }
 
 int Sensors::disable() {
   //TODO Maybe change these for light vs temp...
-  digitalWrite(SENSORS_PWR_PIN, HIGH);
+  digitalWrite(SENSORS_PWR_PIN, LOW);
 }
 
 float Sensors::readTempSensor(int id) {
@@ -45,7 +45,9 @@ float Sensors::readLight(int id) {
   int out = -1;
   if(id <= 3) {
     //One of the light sensors is through direct analog 
+    SBUDNIC_DEBUG_PRINTLN("ADC read");
     out = ads.readADC_SingleEnded(id);
+    SBUDNIC_DEBUG_PRINTLN("done with ADC read");
   } else if (id == 4) {
     out = analogRead(LIGHT_SENSOR_4_PIN);
   } else if (id == 5) {
