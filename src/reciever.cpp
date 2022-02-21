@@ -59,7 +59,7 @@ void Reciever::recieve_data(int howMany) {
         // -> put in some external buffer for the radio to access
         Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
         Reciever::output_position = Reciever::output_position + 1;
-
+        SBUDNIC_DEBUG_PRINTLN(output_position);
         if(Reciever::output_position >= Reciever::buf_len) {
           Reciever::state = REC_FULL;
           return;
@@ -80,7 +80,7 @@ void Reciever::recieve_data(int howMany) {
       // -> put in some external buffer for the radio to access
       Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
       Reciever::output_position = Reciever::output_position + 1;
-
+      SBUDNIC_DEBUG_PRINTLN(output_position);
       if(Reciever::output_position >= Reciever::buf_len) {
         Reciever::state = REC_FULL;
         return;
