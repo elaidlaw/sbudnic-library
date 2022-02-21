@@ -35,12 +35,15 @@ int Reciever::read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_b
 
 
 void Reciever::recieve_data(int howMany) {
+
+  if (Reciever::state == REC_DONE) {
+    return;
+  }
   // SBUDNIC_DEBUG_PRINT("recieving data from uno");
   // SBUDNIC_DEBUG_PRINTLN(howMany);
   uint8_t in[howMany];
   for (int i = 0; i < howMany; i++) {
     in[i] = Wire.read();
-    delay(10);
   }
   SBUDNIC_DEBUG_PRINT(in[howMany-1]);
   // SBUDNIC_DEBUG_PRINT(" ");
@@ -69,6 +72,7 @@ void Reciever::recieve_data(int howMany) {
 
     if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
       Reciever::state = REC_DONE;
+    SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
 
   } else if (c == SSDV_OK) {
@@ -89,6 +93,7 @@ void Reciever::recieve_data(int howMany) {
 
     if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
       Reciever::state = REC_DONE;
+    SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
   } else {
     SBUDNIC_DEBUG_PRINT("SSDV ELSE");
@@ -230,7 +235,7 @@ uint8_t Reciever::pkt[SSDV_PKT_SIZE];
 ssdv_t Reciever::ssdv;
 int Reciever::buf_len = 0;
 int Reciever::photoID = 0;
-bool Reciever::useCam1 = true;
+bool Reciever::useCam1 = false;
 uint8_t Reciever::state = REC_OFF;
 uint8_t *Reciever::output_buffer;
 int Reciever::output_position = 0;
@@ -252,7 +257,7 @@ Reciever::Reciever(uint8_t *ob, int blen) {
   Reciever::buf_len = blen;
   Reciever::photoID = 0;
   Reciever::state = REC_OFF;
-  Reciever::useCam1 = true;
+  Reciever::useCam1 = false;
   Reciever::output_position = 0;
   pinMode(UNO_PWR_PIN, OUTPUT);
   digitalWrite(UNO_PWR_PIN, HIGH);

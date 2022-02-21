@@ -31,9 +31,9 @@
 // radio pins
 #define RFM96_PWR_PIN 5
 #define RFM96_NSS_PIN 3
-#define RFM96_RESET_PIN A6
-#define RFM96_DIO0_PIN A1
-#define RFM96_DIO1_PIN A7
+#define RFM96_RESET_PIN 9
+#define RFM96_DIO0_PIN 7
+#define RFM96_DIO1_PIN 4
 #define RFM96_DIO2_PIN A2
 
 #endif
