@@ -83,7 +83,7 @@ void Reciever::recieve_data(int howMany) {
 
     if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
       Reciever::state = REC_DONE;
-    SBUDNIC_DEBUG_PRINT("SSDV DONE");
+      SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
 
   } else if (c == SSDV_OK) {
@@ -104,7 +104,7 @@ void Reciever::recieve_data(int howMany) {
 
     if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
       Reciever::state = REC_DONE;
-    SBUDNIC_DEBUG_PRINT("SSDV DONE");
+      SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
   } else {
     SBUDNIC_DEBUG_PRINT("SSDV ELSE");
