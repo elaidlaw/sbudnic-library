@@ -12,6 +12,18 @@
 
 
 int Reciever::enable() {
+  char type = SSDV_TYPE_NORMAL;
+  int droptest = 0;
+  int verbose = 0;
+  int errors;
+  char callsign[] = "BROWNU";
+  int8_t quality = 4;
+  SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
+  
+  ssdv_enc_init(&ssdv, type, callsign, photoID, quality);
+  ssdv_enc_set_buffer(&ssdv, pkt);
+  SBUDNIC_DEBUG_PRINTLN("finished SSDV setup");
+  
   Reciever::output_position = 0;
   pinMode(UNO_PWR_PIN, OUTPUT);
   digitalWrite(UNO_PWR_PIN, LOW);
@@ -62,7 +74,6 @@ void Reciever::recieve_data(int howMany) {
         // -> put in some external buffer for the radio to access
         Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
         Reciever::output_position = Reciever::output_position + 1;
-        SBUDNIC_DEBUG_PRINTLN(output_position);
         if(Reciever::output_position >= Reciever::buf_len) {
           Reciever::state = REC_FULL;
           return;
@@ -241,18 +252,6 @@ uint8_t *Reciever::output_buffer;
 int Reciever::output_position = 0;
 
 Reciever::Reciever(uint8_t *ob, int blen) {
-  char type = SSDV_TYPE_NORMAL;
-  int droptest = 0;
-  int verbose = 0;
-  int errors;
-  char callsign[] = "BROWNU";
-  int8_t quality = 4;
-  SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
-  
-  ssdv_enc_init(&ssdv, type, callsign, photoID, quality);
-  ssdv_enc_set_buffer(&ssdv, pkt);
-  SBUDNIC_DEBUG_PRINTLN("finished SSDV setup");
-
   Reciever::output_buffer = ob;
   Reciever::buf_len = blen;
   Reciever::photoID = 0;
