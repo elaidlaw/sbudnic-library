@@ -31,20 +31,23 @@ int Sensors::disable() {
 
 float Sensors::readTempSensor(int id) {
   MaximWire::Bus tempSensorBus(TEMP_SENSOR_PIN);
-  MaximWire::DS18B20 tempSensor0("28C2730C000000DE");
+  MaximWire::DS18B20 tempSensor0("28D24E0C000000ED");
   MaximWire::DS18B20 tempSensor1("28B6F60C00000083");
+  MaximWire::DS18B20 tempSensor2("28FBB60D000000DA");
   float temp = 0.0;
   
   switch(id) {
   case 0:
-    temp = tempSensor0.GetTemperature<float>(tempSensorBus);
     tempSensor0.Update(tempSensorBus);
-    SBUDNIC_DEBUG_PRINTLN("temp");
-    SBUDNIC_DEBUG_PRINTLN(temp);
+    temp = tempSensor0.GetTemperature<float>(tempSensorBus);
     break;
   case 1:
-    temp = tempSensor1.GetTemperature<float>(tempSensorBus);
     tempSensor1.Update(tempSensorBus);
+    temp = tempSensor1.GetTemperature<float>(tempSensorBus);
+    break;
+  case 2:
+    tempSensor2.Update(tempSensorBus);
+    temp = tempSensor2.GetTemperature<float>(tempSensorBus);
     break;
   }
   return temp;
@@ -97,7 +100,7 @@ float Sensors::readLight(int id) {
 void Sensors::readAllSensors(char* out) {
   //change to iterate over addr rather than just numebr..
   sprintf(out, "T:");
-  for(uint16_t i = 0; i < 2; i++) {
+  for(uint16_t i = 0; i < 3; i++) {
     float temp = readTempSensor(i);
     SBUDNIC_DEBUG_PRINTLN("temp");
     SBUDNIC_DEBUG_PRINTLN(temp);
