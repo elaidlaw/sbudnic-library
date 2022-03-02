@@ -32,7 +32,7 @@ int Sensors::disable() {
 float Sensors::readTempSensor(int id) {
   MaximWire::Bus tempSensorBus(TEMP_SENSOR_PIN);
   MaximWire::DS18B20 tempSensor0("28C2730C000000DE");
-  MaximWire::DS18B20 tempSensor1("282A3B0C00000081");
+  MaximWire::DS18B20 tempSensor1("28B6F60C00000083");
   float temp = 0.0;
   
   switch(id) {
