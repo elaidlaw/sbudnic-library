@@ -1,4 +1,4 @@
-// #define SBUDNIC_DEBUG
+#define SBUDNIC_DEBUG
 
 #ifdef SBUDNIC_DEBUG
 #define SBUDNIC_DEBUG_PRINTLN(x) Serial.print("debug: "); Serial.println(x)

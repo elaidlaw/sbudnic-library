@@ -1,4 +1,4 @@
-#include "reciever.h"
+#include "receiver.h"
 #include "pins.h"
 #include "buildopt.h"
 
@@ -11,44 +11,44 @@
 
 
 
-int Reciever::enable() {
+int Receiver::enable() {
   char type = SSDV_TYPE_NORMAL;
   int droptest = 0;
   int verbose = 0;
   int errors;
   char callsign[] = "BROWNU";
-  int8_t quality = 4;
+  int8_t quality = 7;
   SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
   
   ssdv_enc_init(&ssdv, type, callsign, photoID, quality);
   ssdv_enc_set_buffer(&ssdv, pkt);
   SBUDNIC_DEBUG_PRINTLN("finished SSDV setup");
   
-  Reciever::output_position = 0;
+  Receiver::output_position = 0;
   pinMode(UNO_PWR_PIN, OUTPUT);
   digitalWrite(UNO_PWR_PIN, LOW);
   SBUDNIC_DEBUG_PRINTLN("Done enabling Uno");
 
-  Reciever::state = REC_WAIT;
+  Receiver::state = REC_WAIT;
 }
 
-int Reciever::disable() {
+int Receiver::disable() {
   SBUDNIC_DEBUG_PRINTLN("Uno disable called");
   pinMode(UNO_PWR_PIN, OUTPUT);
   digitalWrite(UNO_PWR_PIN, HIGH);
   SBUDNIC_DEBUG_PRINTLN("Done disabling uno");
-  Reciever::state = REC_OFF;
+  Receiver::state = REC_OFF;
 }
 
-int Reciever::read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
-  Reciever::output_buffer = output_buffer;
+int Receiver::read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
+  Receiver::output_buffer = output_buffer;
 }
 
 
 
-void Reciever::recieve_data(int howMany) {
+void Receiver::receive_data(int howMany) {
 
-  if (Reciever::state == REC_DONE) {
+  if (Receiver::state == REC_DONE) {
     return;
   }
   // SBUDNIC_DEBUG_PRINT("recieving data from uno");
@@ -64,25 +64,25 @@ void Reciever::recieve_data(int howMany) {
 
   ///////////////////////////////
   int c;
-  if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_FEED_ME) {
+  if((c = ssdv_enc_get_packet(&Receiver::ssdv)) == SSDV_FEED_ME) {
 
-    ssdv_enc_feed(&Reciever::ssdv, in, howMany);
+    ssdv_enc_feed(&Receiver::ssdv, in, howMany);
 
-    if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_OK) {
+    if((c = ssdv_enc_get_packet(&Receiver::ssdv)) == SSDV_OK) {
       int z;
       for(z=0;z<SSDV_PKT_SIZE;z++){
         // -> put in some external buffer for the radio to access
-        Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
-        Reciever::output_position = Reciever::output_position + 1;
-        if(Reciever::output_position >= Reciever::buf_len) {
-          Reciever::state = REC_FULL;
+        Receiver::output_buffer[Receiver::output_position] = Receiver::pkt[z];
+        Receiver::output_position = Receiver::output_position + 1;
+        if(Receiver::output_position >= Receiver::buf_len) {
+          Receiver::state = REC_FULL;
           return;
         }
       }
     }
 
-    if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
-      Reciever::state = REC_DONE;
+    if((c = ssdv_enc_get_packet(&Receiver::ssdv)) == SSDV_EOI) {
+      Receiver::state = REC_DONE;
       SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
 
@@ -93,17 +93,17 @@ void Reciever::recieve_data(int howMany) {
     int z;
     for(z=0;z<SSDV_PKT_SIZE;z++){
       // -> put in some external buffer for the radio to access
-      Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
-      Reciever::output_position = Reciever::output_position + 1;
+      Receiver::output_buffer[Receiver::output_position] = Receiver::pkt[z];
+      Receiver::output_position = Receiver::output_position + 1;
       SBUDNIC_DEBUG_PRINTLN(output_position);
-      if(Reciever::output_position >= Reciever::buf_len) {
-        Reciever::state = REC_FULL;
+      if(Receiver::output_position >= Receiver::buf_len) {
+        Receiver::state = REC_FULL;
         return;
       }
     }
 
-    if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_EOI) {
-      Reciever::state = REC_DONE;
+    if((c = ssdv_enc_get_packet(&Receiver::ssdv)) == SSDV_EOI) {
+      Receiver::state = REC_DONE;
       SBUDNIC_DEBUG_PRINT("SSDV DONE");
     }
   } else {
@@ -113,15 +113,15 @@ void Reciever::recieve_data(int howMany) {
   
 ///////////////////////////////
 
-  // if((c = ssdv_enc_get_packet(&Reciever::ssdv)) != SSDV_FEED_ME) {
+  // if((c = ssdv_enc_get_packet(&Receiver::ssdv)) != SSDV_FEED_ME) {
   //   if(c == SSDV_EOI){
 	// 		// SBUDNIC_DEBUG_PRINTLN("SSDV EOI");
 	// 		//return here/set state to done
-  //     Reciever::state = REC_DONE;
+  //     Receiver::state = REC_DONE;
   //     return;
 	// 	}else if(c != SSDV_OK){
 	// 		SBUDNIC_DEBUG_PRINTLN("SSDV NOT OK");
-	// 		Reciever::state = REC_FULL;
+	// 		Receiver::state = REC_FULL;
   //     return;
 	// 	}
 
@@ -129,23 +129,23 @@ void Reciever::recieve_data(int howMany) {
   //   SBUDNIC_DEBUG_PRINTLN("writing packet");
   //   for(z=0;z<SSDV_PKT_SIZE;z++){
   //     // -> put in some external buffer for the radio to access
-  //     Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
-  //     Reciever::output_position = Reciever::output_position + 1;
+  //     Receiver::output_buffer[Receiver::output_position] = Receiver::pkt[z];
+  //     Receiver::output_position = Receiver::output_position + 1;
 
-  //     if(Reciever::output_position >= Reciever::buf_len) {
-  //       Reciever::state = REC_FULL;
+  //     if(Receiver::output_position >= Receiver::buf_len) {
+  //       Receiver::state = REC_FULL;
   //       return;
   //     }
   //   }
-  //   SBUDNIC_DEBUG_PRINTLN(Reciever::output_position);
+  //   SBUDNIC_DEBUG_PRINTLN(Receiver::output_position);
   // }
 
-  // if((c = ssdv_enc_get_packet(&Reciever::ssdv)) == SSDV_FEED_ME) {
-  //   ssdv_enc_feed(&Reciever::ssdv, in, howMany);
+  // if((c = ssdv_enc_get_packet(&Receiver::ssdv)) == SSDV_FEED_ME) {
+  //   ssdv_enc_feed(&Receiver::ssdv, in, howMany);
   // }
 
   // if(in[howMany-1]==217 && in[howMany-2]==255) {
-  //   Reciever::state = REC_DONE;
+  //   Receiver::state = REC_DONE;
   //   // SBUDNIC_DEBUG_PRINTLN("should end");
   // }
 
@@ -190,9 +190,9 @@ void Reciever::recieve_data(int howMany) {
 
 
 
-//   ssdv_enc_feed(&Reciever::ssdv, in, howMany);
+//   ssdv_enc_feed(&Receiver::ssdv, in, howMany);
 
-//   int c = ssdv_enc_get_packet(&Reciever::ssdv);
+//   int c = ssdv_enc_get_packet(&Receiver::ssdv);
 
 
   
@@ -210,11 +210,11 @@ void Reciever::recieve_data(int howMany) {
 //     SBUDNIC_DEBUG_PRINTLN("writing packet");
 //     for(z=0;z<SSDV_PKT_SIZE;z++){
 //       // -> put in some external buffer for the radio to access
-//       Reciever::output_buffer[Reciever::output_position] = Reciever::pkt[z];
-//       Reciever::output_position = Reciever::output_position + 1;
+//       Receiver::output_buffer[Receiver::output_position] = Receiver::pkt[z];
+//       Receiver::output_position = Receiver::output_position + 1;
 
-//       if(Reciever::output_position >= Reciever::buf_len) {
-//         Reciever::state = REC_FULL;
+//       if(Receiver::output_position >= Receiver::buf_len) {
+//         Receiver::state = REC_FULL;
 //         return;
 //       }
 //     }
@@ -222,44 +222,45 @@ void Reciever::recieve_data(int howMany) {
 
 //   if(c == SSDV_EOI) {
 //     SBUDNIC_DEBUG_PRINTLN("packeting image done");
-//     Reciever::state = REC_DONE;
+//     Receiver::state = REC_DONE;
 //   }
 //   SBUDNIC_DEBUG_PRINTLN(c);
 }
 
-void Reciever::send_settings() {
-  Wire.write(Reciever::useCam1);
+void Receiver::send_settings() {
+  SBUDNIC_DEBUG_PRINTLN("sending settings");
+  Wire.write(Receiver::useCam1);
 }
 
 
 
-uint8_t Reciever::get_state() {
-  return Reciever::state;
+uint8_t Receiver::get_state() {
+  return Receiver::state;
 }
 
-int Reciever::get_output_pos() {
-  return Reciever::output_position;
+int Receiver::get_output_pos() {
+  return Receiver::output_position;
 }
 
 
-uint8_t Reciever::pkt[SSDV_PKT_SIZE];
-ssdv_t Reciever::ssdv;
-int Reciever::buf_len = 0;
-int Reciever::photoID = 0;
-bool Reciever::useCam1 = false;
-uint8_t Reciever::state = REC_OFF;
-uint8_t *Reciever::output_buffer;
-int Reciever::output_position = 0;
+uint8_t Receiver::pkt[SSDV_PKT_SIZE];
+ssdv_t Receiver::ssdv;
+int Receiver::buf_len = 0;
+int Receiver::photoID = 0;
+bool Receiver::useCam1 = false;
+uint8_t Receiver::state = REC_OFF;
+uint8_t *Receiver::output_buffer;
+int Receiver::output_position = 0;
 
-Reciever::Reciever(uint8_t *ob, int blen) {
-  Reciever::output_buffer = ob;
-  Reciever::buf_len = blen;
-  Reciever::photoID = 0;
-  Reciever::state = REC_OFF;
-  Reciever::useCam1 = false;
-  Reciever::output_position = 0;
+Receiver::Receiver(uint8_t *ob, int blen) {
+  Receiver::output_buffer = ob;
+  Receiver::buf_len = blen;
+  Receiver::photoID = 0;
+  Receiver::state = REC_OFF;
+  Receiver::useCam1 = false;
+  Receiver::output_position = 0;
   pinMode(UNO_PWR_PIN, OUTPUT);
   digitalWrite(UNO_PWR_PIN, HIGH);
   Wire.begin(44);
-  Wire.onRequest(Reciever::send_settings);
+  Wire.onRequest(Receiver::send_settings);
 }
