@@ -25,3 +25,19 @@ void LinkProtocol::getTelemetryPacket(uint8_t* out, uint16_t numDataPoints, uint
 void LinkProtocol::getRestartPacket(uint8_t* out) {
     sprintf((char*)out, "RRRRRRR");
 }
+
+int LinkProtocol::processMessage(char* in, LinkInteface* link) {
+    if (strcmp(in, COMMAND_HEADER) != 0) {
+        return 0;
+    }
+    in = in + 6;
+    char out[64];
+    if (strcmp(in, UPLINK_TEST_COMMAND) == 0) {
+        sprintf(out, "R  %s  %s" UPLINK_TEST_COMMAND, UPLINK_TEST_RESPONSE);
+    } else if (strcmp(in, UPLINK_TEST_COMMAND)) {
+        
+    }
+    link->enable()
+    link->transmit(out);
+    link->disable()
+}
