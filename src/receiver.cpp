@@ -17,7 +17,7 @@ int Receiver::enable() {
   int verbose = 0;
   int errors;
   char callsign[] = "BROWNU";
-  int8_t quality = 7;
+  int8_t quality = 3;
   SBUDNIC_DEBUG_PRINTLN("starting SSDV setup");
   
   ssdv_enc_init(&ssdv, type, callsign, photoID, quality);

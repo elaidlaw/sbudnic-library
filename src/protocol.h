@@ -30,7 +30,9 @@
 #define SLEEP_COMMAND "SG"
 #define SLEEP_RESPONSE "Goodnight "
 #define DOWNLINK_INTERVAL_COMMAND "TW"
-#define DOWNLINK_INTERNAL_RESPONSE "Tempo "
+#define DOWNLINK_INTERVAL_RESPONSE "Tempo "
+#define RESET_PERSISTENT_COMMAND "MF"
+#define RESET_PERSISTENT_RESPONSE "Config reset"
 
 class LinkProtocol {
   public:
@@ -41,7 +43,8 @@ class LinkProtocol {
     static void getTelemetryPacket(uint8_t* out, uint16_t numDataPoints, uint8_t* data);
     static void getRestartPacket(uint8_t* out);
 
-    static void processMessage(char* in, LinkInterface* link);
+    static int processMessage(char* in, LinkInterface* link);
+    static constexpr void(* resetFunction) (void) = 0;
 };
 
 #endif
