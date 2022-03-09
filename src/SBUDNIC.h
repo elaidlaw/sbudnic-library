@@ -4,3 +4,4 @@
 #include "receiver.h"
 #include "protocol.h"
 #include "wdt.h"
+#include "FlashIAPBlockDevice.h"
