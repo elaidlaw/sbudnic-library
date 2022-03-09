@@ -26,7 +26,8 @@ class Config {
     static void save();
     static void reset();
     
-    static ConfigData data;
+    inline static ConfigData data = {true,true,false,0};;
 };
 
+// ConfigData Config::data = {true,true,false,0};
 #endif
