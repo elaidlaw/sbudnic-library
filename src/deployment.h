@@ -9,8 +9,7 @@ class DeploymentInterface {
     virtual ~DeploymentInterface(){};
     virtual int enable() = 0;
     virtual int disable() = 0;
-    virtual int deployAOCS() = 0;
-    virtual int deployAntenna() = 0;
+    virtual int deploy() = 0;
 };
 
 class Deployment: public DeploymentInterface {
@@ -19,8 +18,7 @@ class Deployment: public DeploymentInterface {
     ~Deployment(){}
     int enable(){return 0;}
     int disable(){return 0;}
-    int deployAOCS();
-    int deployAntenna();
+    int deploy();
 };
 
 #endif
