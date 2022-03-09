@@ -1,6 +1,8 @@
 #ifndef SBUDNIC_CONFIG_H
 #define SBUDNIC_CONFIG_H
 
+#include <stdint.h>
+
 #define CONFIG_KEY "config"
 
 #define CAM_RES_320x240 0

@@ -1,6 +1,7 @@
 #include "receiver.h"
 #include "pins.h"
 #include "buildopt.h"
+#include "config.h"
 
 
 

@@ -4,6 +4,7 @@
 #include "KVStore.h"
 #include "kvstore_global_api.h"
 
+
 void Config::load() {
   kv_get(CONFIG_KEY, (uint8_t*)&Config::data, sizeof(Config::data), 0);
 }
