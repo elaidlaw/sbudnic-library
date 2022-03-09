@@ -17,5 +17,6 @@ void Config::reset() {
   Config::data.camera1Enabled = true;
   Config::data.camera2Enabled = true;
   Config::data.safeToOperate = false;
+  Config::data.resolution = 0;
   kv_set(CONFIG_KEY, (uint8_t*)&Config::data, sizeof(Config::data), 0);
 }
