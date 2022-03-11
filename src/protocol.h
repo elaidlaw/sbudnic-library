@@ -33,6 +33,9 @@
 #define DOWNLINK_INTERVAL_RESPONSE "Tempo "
 #define RESET_PERSISTENT_COMMAND "MF"
 #define RESET_PERSISTENT_RESPONSE "Config reset"
+#define SEND_CONFIG_COMMAND "U0"
+#define SEND_CONFIG_RESPONSE "Config "
+#define UNKNOWN_RESPONSE "Unknown"
 
 class LinkProtocol {
   public:
@@ -42,8 +45,11 @@ class LinkProtocol {
     static void getTelemetryPacket(uint8_t* out, uint16_t numDataPoints);
     static void getTelemetryPacket(uint8_t* out, uint16_t numDataPoints, uint8_t* data);
     static void getRestartPacket(uint8_t* out);
+    
+    static void getUplinkStart(uint8_t* out);
+    static void getUplinkEnd(uint8_t* out);
 
-    static int processMessage(char* in, LinkInterface* link);
+    static int processCommand(char* in, LinkInterface* link);
     static constexpr void(* resetFunction) (void) = 0;
 };
 

@@ -7,6 +7,8 @@ typedef struct {
   bool camera1Enabled;
   bool camera2Enabled;
   bool safeToOperate;
+  bool loraEnabled;
+  long downlinkInterval;
 } ConfigData;
 
 class Config {
@@ -15,7 +17,7 @@ class Config {
     static void save();
     static void reset();
     
-    static ConfigData data;
+    inline static ConfigData data;
 };
 
 #endif

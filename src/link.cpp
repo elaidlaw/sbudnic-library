@@ -11,8 +11,8 @@
 #define RADIO_CONNECTION_UNSUCCESSFUL 1
 
 SX1278 radio = new Module(RFM96_NSS_PIN, RFM96_DIO0_PIN, RFM96_RESET_PIN, RFM96_DIO1_PIN);
-AFSKClient audio(&radio, RFM96_DIO2_PIN);
-AX25Client ax25(&audio);
+// AFSKClient audio(&radio, RFM96_DIO2_PIN);
+// AX25Client ax25(&audio);
 
 #define CHECK(x) do { \
   int retval = (x); \
@@ -50,10 +50,8 @@ int SerialLink::transmit(byte* data, uint16_t count) {
   return 0;
 }
 
-char SerialLink::receive(long timeout) {
+char SerialLink::receive(byte* command) {
   SBUDNIC_DEBUG_PRINTLN("beginning serial receive");
-  long start = millis();
-  while (millis() - start < timeout && !Serial.available()) {}
   int received = Serial.read();
   if (received == -1) {
     return 0;
@@ -81,7 +79,7 @@ int RFM96Link::enable() {
   SBUDNIC_DEBUG_PRINTLN("RFM96 setOutputPower called");
   CHECK(radio.setCurrentLimit(140));
   SBUDNIC_DEBUG_PRINTLN("RFM96 setCurrentLimit called");
-  CHECK(ax25.begin(CALL_SIGN));
+  // CHECK(ax25.begin(CALL_SIGN));
   SBUDNIC_DEBUG_PRINTLN("RFM96 ax25 begin called");
   SBUDNIC_DEBUG_PRINTLN("done enabling RFM96");
   return 0;
@@ -97,12 +95,12 @@ int RFM96Link::disable() {
 
 int RFM96Link::transmit(char* data) {
   SBUDNIC_DEBUG_PRINTLN("beginning RFM96 transmit");
-  CHECK(ax25.transmit(data, CALL_SIGN));
+  // CHECK(ax25.transmit(data, CALL_SIGN));
   SBUDNIC_DEBUG_PRINTLN("RFM96 ax25 transmit called");
   SBUDNIC_DEBUG_PRINTLN("done with RFM96 transmit");
 }
 
-char RFM96Link::receive(long timeout) {
+char RFM96Link::receive(byte* command) {
   return 0;
 }
 
@@ -157,6 +155,13 @@ int RFM96LoRALink::transmit(byte* data, uint16_t count) {
   SBUDNIC_DEBUG_PRINTLN("done with RFM96 transmit");
 }
 
-char RFM96LoRALink::receive(long timeout) {
-  return 0;
+char RFM96LoRALink::receive(byte* command) {
+  SBUDNIC_DEBUG_PRINTLN("Listening");
+  int state = radio.receive(command, 256);
+  SBUDNIC_DEBUG_PRINTLN(state);
+  if (state == RADIOLIB_ERR_NONE) {
+    SBUDNIC_DEBUG_PRINTLN((char*)command);
+    return 1;
+  }
+  return 1;
 }

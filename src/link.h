@@ -16,7 +16,7 @@ class LinkInterface {
     virtual int transmit(byte* data, uint16_t count) = 0;
     // receive for timeout milliseconds and return the received command
     // if there is one or 0x00 otherwise
-    virtual char receive(long timeout) = 0;
+    virtual char receive(byte* command) = 0;
 };
 
 class RFM96Link: public LinkInterface {
@@ -32,7 +32,7 @@ class RFM96Link: public LinkInterface {
     int disable();
     int transmit(char* data);
     int transmit(byte* data, uint16_t count) {};
-    char receive(long timeout);
+    char receive(byte* command);
 };
 
 class RFM96LoRALink: public LinkInterface {
@@ -44,7 +44,7 @@ class RFM96LoRALink: public LinkInterface {
     int disable();
     int transmit(char* data);
     int transmit(byte* data, uint16_t count);
-    char receive(long timeout);
+    char receive(byte* command);
 };
 
 class SerialLink: public LinkInterface {
@@ -55,7 +55,7 @@ class SerialLink: public LinkInterface {
     int disable();
     int transmit(char* data);
     int transmit(byte* data, uint16_t count);
-    char receive(long timeout);
+    char receive(byte* command);
 };
 
 #endif

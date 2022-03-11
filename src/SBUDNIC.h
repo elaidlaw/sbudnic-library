@@ -5,3 +5,4 @@
 #include "protocol.h"
 #include "wdt.h"
 #include "config.h"
+#include "deployment.h"
