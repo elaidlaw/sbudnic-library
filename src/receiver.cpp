@@ -1,6 +1,7 @@
 #include "receiver.h"
 #include "pins.h"
 #include "buildopt.h"
+#include "config.h"
 
 
 
@@ -229,7 +230,17 @@ void Receiver::receive_data(int howMany) {
 
 void Receiver::send_settings() {
   SBUDNIC_DEBUG_PRINTLN("sending settings");
-  Wire.write(Receiver::useCam1);
+  Config::load();
+  Wire.write(Config::data.camera1Enabled);
+  delay(5);
+  Wire.write(Config::data.camera2Enabled);
+  delay(5);
+  Wire.write(Config::data.safeToOperate);
+  delay(5);
+  Wire.write(Config::data.resolution);
+  //1,1,1,1 bits sent
+
+  //TODO: is cam2enabled redundant?
 }
 
 
