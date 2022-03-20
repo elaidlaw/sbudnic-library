@@ -83,17 +83,6 @@ float Sensors::readLight(int id) {
       }
   }
 
-  // if(id <= 3) {
-  //   //One of the light sensors is through direct analog 
-  //   SBUDNIC_DEBUG_PRINTLN("ADC read");
-  //   // out = ads.readADC_SingleEnded(id);
-  //   out = 
-  //   SBUDNIC_DEBUG_PRINTLN("done with ADC read");
-  // } else if (id == 4) {
-  //   out = analogRead(LIGHT_SENSOR_4_PIN);
-  // } else if (id == 5) {
-  //   out = analogRead(LIGHT_SENSOR_5_PIN);
-  // }
   return out / 1024.0;
 }
 
@@ -106,23 +95,7 @@ void Sensors::readAllSensors(char* out) {
     SBUDNIC_DEBUG_PRINTLN(temp);
     sprintf(out, "%s%.2f|", out, temp);
   }
-  // MaximWire::Bus bus(TEMP_SENSOR_PIN);
-  // MaximWire::DS18B20 device;
-  // MaximWire::Discovery discovery = bus.Discover();
-  // do {
-  //     MaximWire::Address address;
-  //     if (discovery.FindNextDevice(address)) {
-  //       MaximWire::DS18B20 device(address);
-  //       float temp = device.GetTemperature<float>(bus);
-  //       SBUDNIC_DEBUG_PRINTLN(temp);
-  //       device.Update(bus);  
-  //       sprintf(out, "%s%.2f|", out, temp);
-  //     } else {
-  //       float temp = -1;
-  //       sprintf(out, "%s%.2f|", out, temp);
-  //     }
-  // } while (discovery.HaveMore());
-  
+ 
   sprintf(out, "%sL:", out);
   for(uint16_t i = 0; i < 6; i++) {
     float light = readLight(i);
