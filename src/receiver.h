@@ -30,26 +30,6 @@ class ReceiverInterface {
     // virtual static void send_settings() = 0;
 };
 
-// class Reciever: public RecieverInterface {
-//   private:
-//     static ssdv_t ssdv;
-//     static uint8_t pkt[SSDV_PKT_SIZE];
-//     static int buf_len;
-//     int photoID;
-//     static bool useCam1;
-//     static uint8_t state;
-//     static uint8_t *output_buffer;
-//     static int output_position;
-//   public:
-//     Reciever(uint8_t *ob, int blen);
-//     ~Reciever(){};
-//     int enable();
-//     int disable();
-//     int read_data(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer);
-//     uint8_t get_state();
-//     static void recieve_data(int howMany);
-//     static void send_settings();
-// };
 
 class Receiver: public ReceiverInterface {
   private:
