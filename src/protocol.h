@@ -50,6 +50,7 @@ class LinkProtocol {
     static void getUplinkEnd(uint8_t* out);
 
     static int processCommand(char* in, LinkInterface* link);
+    static void tacticalRestart();
     static constexpr void(* resetFunction) (void) = 0;
 };
 

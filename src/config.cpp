@@ -15,11 +15,14 @@ void Config::save() {
 
 void Config::reset() {
   kv_reset("/kv/");
+  Config::data.restartCount = 0;
+  Config::data.tacticalRestartCount = 1;
   Config::data.camera1Enabled = true;
   Config::data.camera2Enabled = true;
   Config::data.safeToOperate = false;
   Config::data.loraEnabled = true;
   Config::data.downlinkInterval = 600;
   Config::data.resolution = 0;
+  Config::data.uplinkDuration = 30;
   kv_set(CONFIG_KEY, (uint8_t*)&Config::data, sizeof(Config::data), 0);
 }

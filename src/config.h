@@ -14,12 +14,15 @@
 #define CAM_RES_2592x1944 6
 
 typedef struct {
+  uint16_t restartCount;
+  uint16_t tacticalRestartCount;
   bool camera1Enabled;
   bool camera2Enabled;
   bool safeToOperate;
   bool loraEnabled;
   long downlinkInterval;
   uint8_t resolution;
+  uint16_t uplinkDuration;
 } ConfigData;
 
 class Config {
@@ -28,8 +31,6 @@ class Config {
     static void save();
     static void reset();
     
-    inline static ConfigData data = {true,true,false,true,600,0};;
+    inline static ConfigData data = {0,1,true,true,false,true,600,0,30};
 };
-
-// ConfigData Config::data = {true,true,false,0};
 #endif
