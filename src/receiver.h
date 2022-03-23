@@ -17,6 +17,7 @@
 #define REC_DONE 1
 #define REC_FULL 2
 #define REC_OFF 3
+#define REC_FAIL 4
 
 class ReceiverInterface {
   public:
