@@ -31,9 +31,8 @@ int Sensors::disable() {
 
 float Sensors::readTempSensor(int id) {
   MaximWire::Bus tempSensorBus(TEMP_SENSOR_PIN);
-  MaximWire::DS18B20 tempSensor0("283E660B000000F9");
-  MaximWire::DS18B20 tempSensor1("285C930C000000A6");
-  MaximWire::DS18B20 tempSensor2("28FBB60D000000DA");
+  MaximWire::DS18B20 tempSensor0("281ADE0C00000064"); // obdh
+  MaximWire::DS18B20 tempSensor1("28A684E20800004F"); // eps
   float temp = 0.0;
   
   switch(id) {
@@ -44,10 +43,6 @@ float Sensors::readTempSensor(int id) {
   case 1:
     tempSensor1.Update(tempSensorBus);
     temp = tempSensor1.GetTemperature<float>(tempSensorBus);
-    break;
-  case 2:
-    tempSensor2.Update(tempSensorBus);
-    temp = tempSensor2.GetTemperature<float>(tempSensorBus);
     break;
   }
   return temp;

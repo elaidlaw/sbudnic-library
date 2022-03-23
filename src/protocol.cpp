@@ -51,6 +51,7 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
     if (strncmp(in, COMMAND_HEADER, 6) != 0) {
         return -1;
     }
+    int code = 0;
     in = in + 6;
     SBUDNIC_DEBUG_PRINTLN("header good");
     char out[256];
@@ -65,7 +66,7 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
         sprintf(out, "UR %s  %s", RESET_PERSISTENT_COMMAND, RESET_PERSISTENT_RESPONSE);
         Config::reset();
     } else if (strncmp(in, SEND_CONFIG_COMMAND, 2) == 0) {
-        sprintf(out, "UR %s  %s%06d %06d %d %d %d %d %06d %06d",
+        sprintf(out, "UR %s  %s%06d %06d %d %d %d %d %06d %06d %06d %06d %s",
             SEND_CONFIG_COMMAND,
             SEND_CONFIG_RESPONSE,
             Config::data.restartCount,
@@ -75,7 +76,10 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
             Config::data.camera2Enabled,
             Config::data.loraEnabled,
             Config::data.downlinkInterval,
-            Config::data.uplinkDuration
+            Config::data.uplinkDuration,
+            Config::data.uplinkDuringSleepInterval,
+            Config::data.telemetryBufferInterval,
+            Config::data.callSign
             );
     } else if (strncmp(in, AFSK_ENABLE_COMMAND, 2) == 0) {
         sprintf(out, "UR %s  %s", AFSK_ENABLE_COMMAND, AFSK_ENABLE_RESPONSE);
@@ -106,14 +110,8 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
         in[6] = '\0';
         long seconds = atoi(in);
         sprintf(out, "UR %s  %s %06d", SLEEP_COMMAND, SLEEP_RESPONSE, seconds);
-        // transmit now because we're going to sleep
-        link->transmit(out);
-        if (seconds < 86400) {
-            WDT::wddelay(seconds * 1000);
-        }
-        LinkProtocol::tacticalRestart();
+        code = SLEEP_CODE;
     } else if (strncmp(in, DOWNLINK_INTERVAL_COMMAND, 2) == 0) {
-        SBUDNIC_DEBUG_PRINTLN("downlink interval");
         in = in + 2;
         in[6] = '\0';
         long seconds = atoi(in);
@@ -121,10 +119,48 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
         sprintf(out, "UR %s  %s%06d", DOWNLINK_INTERVAL_COMMAND, DOWNLINK_INTERVAL_COMMAND, seconds);
         Config::data.downlinkInterval = seconds;
         Config::save();
+    } else if (strncmp(in, UPLINK_DURATION_COMMAND, 2) == 0) {
+        in = in + 2;
+        in[6] = '\0';
+        long seconds = atoi(in);
+        SBUDNIC_DEBUG_PRINTLN(seconds);
+        sprintf(out, "UR %s  %s%06d", UPLINK_DURATION_COMMAND, UPLINK_DURATION_RESPONSE, seconds);
+        Config::data.uplinkDuration = seconds;
+        Config::save();
+    } else if (strncmp(in, UPLINK_DURING_SLEEP_INTERVAL_COMMAND, 2) == 0) {
+        in = in + 2;
+        in[6] = '\0';
+        long seconds = atoi(in);
+        SBUDNIC_DEBUG_PRINTLN(seconds);
+        sprintf(out, "UR %s  %s%06d", UPLINK_DURING_SLEEP_INTERVAL_COMMAND, UPLINK_DURING_SLEEP_INTERVAL_RESPONSE, seconds);
+        Config::data.uplinkDuringSleepInterval = seconds;
+        Config::save();
+    } else if (strncmp(in, TELEMETRY_BUFFER_INTERVAL_COMMAND, 2) == 0) {
+        in = in + 2;
+        in[6] = '\0';
+        long seconds = atoi(in);
+        SBUDNIC_DEBUG_PRINTLN(seconds);
+        sprintf(out, "UR %s  %s%06d", TELEMETRY_BUFFER_INTERVAL_COMMAND, TELEMETRY_BUFFER_INTERVAL_RESPONSE, seconds);
+        Config::data.telemetryBufferInterval = seconds;
+        Config::save();
+    } else if (strncmp(in, CALL_SIGN_COMMAND, 2) == 0) {
+        in = in + 2;
+        char lengthStr[2];
+        lengthStr[0] = in[0];
+        lengthStr[1] = '\0';
+        int length = 0;
+        in = in + 1;
+        in[length] = '\0';
+        strcpy(Config::data.callSign, in);
+        sprintf(out, "UR %s  %s%06d", CALL_SIGN_COMMAND, CALL_SIGN_REPONSE, Config::data.callSign);
+        Config::save();
+    } else if (strncmp(in, TELEMETRY_DUMP_COMMAND, 2) == 0) {
+        sprintf(out, "UR %s  %s", TELEMETRY_DUMP_COMMAND, TELEMETRY_DUMP_RESPONSE);
+        code = TELEMETRY_DUMP_CODE;
     } else {
         in[2] = '\0';
         sprintf(out, "UR %s  %s", in, UNKNOWN_RESPONSE);
     }
     link->transmit(out);
-    return 0;
+    return code;
 }

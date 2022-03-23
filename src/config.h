@@ -23,6 +23,10 @@ typedef struct {
   long downlinkInterval;
   uint8_t resolution;
   uint16_t uplinkDuration;
+  uint16_t uplinkDuringSleepInterval;
+  uint16_t telemetryBufferInterval;
+  char callSign[7];
+  float frequency;
 } ConfigData;
 
 class Config {
@@ -31,6 +35,6 @@ class Config {
     static void save();
     static void reset();
     
-    inline static ConfigData data = {0,1,true,true,false,true,600,0,30};
+    inline static ConfigData data = {0,1,true,true,false,true,600,0,30,600,60,"SBDNIC",435.0};
 };
 #endif
