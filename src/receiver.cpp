@@ -110,8 +110,7 @@ void Receiver::receive_data(int howMany) {
   } else {
     SBUDNIC_DEBUG_PRINT("SSDV ELSE");
     SBUDNIC_DEBUG_PRINTLN(c);
-
-    //TODO: Something has gone wrong here!
+    Receiver::state = REC_FAIL;
   }
 }
 
