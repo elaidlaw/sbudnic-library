@@ -64,6 +64,11 @@ class LinkProtocol {
     static void getUplinkStart(uint8_t* out);
     static void getUplinkEnd(uint8_t* out);
 
+    static void getTelemetryDumpStart(uint8_t* out, uint16_t numDataPoints);
+    static void getTelemetryDumpEnd(uint8_t* out, uint16_t numDataPoints);
+    static void getTelemetryDumpHeader(uint8_t* out, uint16_t packetNumber);
+    static int getTelemetryDumpPacketPart(uint8_t* out, bool sensor1, bool sensor2, long time, float val1, float val2);
+
     static int processCommand(char* in, LinkInterface* link);
     static void tacticalRestart();
     static constexpr void(* resetFunction) (void) = 0;

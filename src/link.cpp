@@ -1,5 +1,6 @@
 #include "link.h"
 #include "buildopt.h"
+#include "config.h"
 
 #define RADIO_DOWNLINK_FREQUENCY 435.0
 #define RADIO_UPLINK_FREQUENCY 435.0
@@ -123,7 +124,7 @@ int RFM96LoRALink::enable() {
   SBUDNIC_DEBUG_PRINTLN("RFM96 begin called");
   CHECK(radio.setOutputPower(RADIO_RF_POWER));
   SBUDNIC_DEBUG_PRINTLN("RFM96 setOutputPower called");
-  CHECK(radio.setFrequency(RADIO_DOWNLINK_FREQUENCY));
+  CHECK(radio.setFrequency(Config::data.frequency));
   SBUDNIC_DEBUG_PRINTLN("RFM96 setFrequency called");
   CHECK(radio.setCurrentLimit(140));
   SBUDNIC_DEBUG_PRINTLN("RFM96 setCurrentLimit called");

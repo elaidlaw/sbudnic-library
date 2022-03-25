@@ -43,6 +43,33 @@ void LinkProtocol::tacticalRestart() {
     resetFunction();
 }
 
+void LinkProtocol::getTelemetryDumpStart(uint8_t* out, uint16_t numDataPoints) {
+    sprintf((char*)out, "DS%05d", numDataPoints);
+}
+
+void LinkProtocol::getTelemetryDumpEnd(uint8_t* out, uint16_t numDataPoints) {
+    sprintf((char*)out, "DE%05d", numDataPoints);
+}
+
+void LinkProtocol::getTelemetryDumpHeader(uint8_t* out, uint16_t packetNumber) {
+    sprintf((char*)out, "DD%05d", packetNumber);
+}
+
+int LinkProtocol::getTelemetryDumpPacketPart(uint8_t* out, bool sensor1, bool sensor2, long time, float val1, float val2) {
+    if (sensor1 && sensor2) {
+        sprintf((char*)out, "%06d|%+02.02f|%+02.02f|", time, val1, val2);
+        return 21;
+    }
+    if (sensor1) {
+        sprintf((char*)out, "%06d|%+02.02f|", time, val1);
+        return 14;
+    }
+    if (sensor2) {
+        sprintf((char*)out, "%06d|%+02.02f|", time, val2);
+        return 14;
+    }
+}
+
 int LinkProtocol::processCommand(char* in, LinkInterface* link) {
     // assuming that the link is enabled, and leaving it enabled
     SBUDNIC_DEBUG_PRINTLN("process");
@@ -157,6 +184,18 @@ int LinkProtocol::processCommand(char* in, LinkInterface* link) {
     } else if (strncmp(in, TELEMETRY_DUMP_COMMAND, 2) == 0) {
         sprintf(out, "UR %s  %s", TELEMETRY_DUMP_COMMAND, TELEMETRY_DUMP_RESPONSE);
         code = TELEMETRY_DUMP_CODE;
+    } else if (strncmp(in, FREQUENCY_COMMAND, 2) == 0) {
+        // 400-500
+        in = in + 2;
+        in[7] = '\0';
+        float freq1 = atof(in);
+        in[15] = '\0';
+        float freq2 = atof(in + 8);
+        sprintf(out, "UR %s  %s%03.03d %03.03d", FREQUENCY_COMMAND, FREQUENCY_RESPONSE, freq1, freq2);
+        if (freq1 == freq2 && freq1 > 400 && freq1 < 500) {
+            Config::data.frequency = freq1;
+            Config::save();
+        }
     } else {
         in[2] = '\0';
         sprintf(out, "UR %s  %s", in, UNKNOWN_RESPONSE);
