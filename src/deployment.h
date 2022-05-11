@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include "pins.h"
 
+//Class that handles deployment of the satellite, specifically release of the //
+//antennae and AOCS.
 class DeploymentInterface {
   public:
     virtual ~DeploymentInterface(){};

@@ -6,6 +6,7 @@
 #include "pins.h"
 #include "ssdv.h"
 
+//Class that is responsible for uplink and downlink between satellite and GS, including via Serial, RFM96, and RFM96 with LoRA. 
 class LinkInterface {
   public:
     virtual ~LinkInterface(){};
@@ -20,10 +21,6 @@ class LinkInterface {
 };
 
 class RFM96Link: public LinkInterface {
-  // private:
-  //   RFM96* radio;
-  //   AFSKClient* audio;
-  //   AX25Client* ax25;
 
   public:
     RFM96Link();

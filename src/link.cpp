@@ -20,6 +20,7 @@ SX1278 radio = new Module(RFM96_NSS_PIN, RFM96_DIO0_PIN, RFM96_RESET_PIN, RFM96_
   } \
 } while (0)
 
+// Serial version of radio connection, used for testing.
 int SerialLink::enable() {
   SBUDNIC_DEBUG_PRINTLN("enabling serial link");
   Serial.begin(9600);
@@ -58,6 +59,7 @@ char SerialLink::receive(byte* command) {
   return received;
 }
 
+//Code for use of RFM96 radio, not used in final SBUDNIC
 RFM96Link::RFM96Link() {
 
   pinMode(RFM96_PWR_PIN, OUTPUT);
@@ -103,6 +105,7 @@ char RFM96Link::receive(byte* command) {
   return 0;
 }
 
+//Code to support LoRA transmission on RFM96 radio.
 RFM96LoRALink::RFM96LoRALink() {
 
   pinMode(RFM96_PWR_PIN, OUTPUT);

@@ -3,23 +3,11 @@
 #include "buildopt.h"
 
 /**
- * how i think  this all will  be used in our main loop
- * camera.enable()
- * l = camera.takepicture
- * outputbuffer[<however big we will need for the packets>]
- * camera.readdata(outputbuffer, <that specified size>)
- * 
- **/
-
-
-//TODO: how can we tell how big our buffer will need to be?
-//  "Each packet is 256 bytes with 205 or 237 bytes of the actual image depending on whether Reed-Solomon forward error correction is used or not."
-
-//TODO: ID (0-255) should change with each photo so we know which packets belong to which photo
-
-
-// ArduCAM cam1(OV5642, CAM1_CS_PIN);
-// ArduCAM cam2(OV5642, CAM2_CS_PIN);
+ * This code was not used in the final SBUDNIC satellite. This code was 
+ * intended to be used on the main arduino Nano 33BLE. There were problems with 
+ * the Wire library when using this code alongside the open source radio 
+ * libraries, which led to us adding the additional MCU to SBUDNIC.
+ */
 
 int Camera::enable() {
   
@@ -83,57 +71,9 @@ int Camera::disable() {
   digitalWrite(powerPin, HIGH);
   digitalWrite(csPin, HIGH);
   SBUDNIC_DEBUG_PRINTLN("Done disabling camera");
-}
-
-// //Function which takes in a buffer address and reads bytes from the camera buffer into it.
-// //returns: the number of bits read to the buffer.
-// size_t Camera::populate_buffer(uint8_t *b)
-// {
-//   uint8_t temp = 0, temp_last = 0;
-//   uint32_t length = 0;
-//   bool is_header = false;
-//   length = camera.read_fifo_length();
-
-//   camera.CS_LOW();
-//   camera.set_fifo_burst();
-//   temp = SPI.transfer(0x00);
-//   length--;
-
-//   int ptr = 0;
-
-//   while ( length-- )
-//   {
-//     temp_last = temp;
-//     temp =  SPI.transfer(0x00);
-//     if (is_header == true)
-//     {
-//       b[ptr] = temp;
-//       ptr = ptr + 1;
-//     }
-//     else if ((temp == 0xD8) & (temp_last == 0xFF))
-//     {
-//       is_header = true;
-//       b[ptr] = temp_last;
-//       b[ptr+1] = temp;
-
-//       //shouldnt matter...
-//       ptr = ptr + 2;
-//     }
-//     if ( (temp == 0xD9) && (temp_last == 0xFF) )
-//     break;
-//     delayMicroseconds(15);
-//   }
-//   camera.CS_HIGH();
-//   is_header = false;
-//   return (ptr);
-// }
-
-//Function which takes in a pointer to the full buffer and packetizes/writes them to a buffer.
-//returns: number of packets made
 
 //TODO: length argument is not needed most likely
 int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *output_buffer) {
-///////////////////////
   uint8_t full_buffer[128] = {0};
   uint8_t temp = 0, temp_last = 0;
   bool is_header = false;
@@ -144,13 +84,9 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
   delay(100);
   camera.set_fifo_burst();
   temp = SPI.transfer(0x00);
-///////////////////////
 
   SBUDNIC_DEBUG_PRINTLN("starting ssdv encoding");
 
-
-
-  // int ptr = 0;
   int c;
   int pkt_cnt = 0;
   int output_position = 0;
@@ -159,7 +95,6 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
     while((c = ssdv_enc_get_packet(&ssdv)) == SSDV_FEED_ME){
       SBUDNIC_DEBUG_PRINTLN("ssdv encoding");
 
-      //////////////////////
       //Get the next <=128 bytes from the photo
       int ptr = 0;
       while(ptr < 128){
@@ -181,12 +116,6 @@ int Camera::transmit_packets(uint32_t length, uint8_t *jpeg_buffer, uint8_t *out
         }
         delayMicroseconds(15);
       }
-
-
-      //////////////////////  
-
-
-      
       
       //encode the next chunk of data
       ssdv_enc_feed(&ssdv, full_buffer, ptr);

@@ -2,25 +2,16 @@
 #include <Adafruit_ADS1X15.h>
 #include <MaximWire.h>
 #include "buildopt.h"
-
-// Adafruit_ADS1015 ads;
-
-
-
-
-//TODO: CHANGE THIS SENSOR ID TO THE ONE WERE ACTUALLY USING!
-
+//This class is responsible for the temperature sensors on board SBUDNIC
 
 Sensors::Sensors() {
   pinMode(SENSORS_PWR_PIN, OUTPUT);
-  // digitalWrite(SENSORS_PWR_PIN, LOW);
 }
 
 int Sensors::enable() {
   SBUDNIC_DEBUG_PRINTLN("enabling sensors");
   pinMode(SENSORS_PWR_PIN, OUTPUT);
   digitalWrite(SENSORS_PWR_PIN, HIGH);
-  // SBUDNIC_DEBUG_PRINTLN(ads.begin(0x48));
   SBUDNIC_DEBUG_PRINTLN("enabled sensors");
 }
 
@@ -29,6 +20,12 @@ int Sensors::disable() {
   digitalWrite(SENSORS_PWR_PIN, LOW);
 }
 
+/**
+ * @brief Reads the temperatures from our specific sensors using MaximWire library.
+ * 
+ * @param id the id of the temp sensor we are querying (0 or 1)
+ * @return float the temperature of the indicated sensor
+ */
 float Sensors::readTempSensor(int id) {
   MaximWire::Bus tempSensorBus(TEMP_SENSOR_PIN);
   MaximWire::DS18B20 tempSensor0("281ADE0C00000064"); // obdh
@@ -48,9 +45,9 @@ float Sensors::readTempSensor(int id) {
   return temp;
 }
 
+//This code was written before we removed the light sensors from the final SBUDNIC satellite.
 float Sensors::readLight(int id) {
   int out = -1;
-  // SBUDNIC_DEBUG_PRINTLN("sensors switch statement");
   switch(id) {
     case 0: {
       out = analogRead(LIGHT_SENSOR_0_PIN);

@@ -13,6 +13,11 @@
 #include "ssdv.h"
 #include "pins.h"
 
+/**
+ * This code was not used in the final SBUDNIC satellite - was written before 
+ * adding a ATmega328P to the board which handles camera operation.
+ */
+
 class CameraInterface {
   public:
     virtual ~CameraInterface(){};

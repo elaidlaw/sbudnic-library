@@ -5,6 +5,7 @@
 
 #include "pins.h"
 
+//Interface which supports the sensors onboard SBUDNIC
 class SensorsInterface {
   public:
     virtual ~SensorsInterface(){};

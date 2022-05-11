@@ -13,6 +13,7 @@
 #define CAM_RES_2048x1536 5
 #define CAM_RES_2592x1944 6
 
+//Data structure to store our satellite's config
 typedef struct {
   uint16_t restartCount;
   uint16_t tacticalRestartCount;
@@ -29,6 +30,7 @@ typedef struct {
   float frequency;
 } ConfigData;
 
+//Class that handles writing/retrieval of the config
 class Config {
   public:
     static void load();

@@ -1,18 +1,26 @@
 #include "config.h"
-
-
 #include "KVStore.h"
 #include "kvstore_global_api.h"
 
-
+/**
+ * @brief - loads the current config data from persistent storage to
+ * the config data structure
+ */
 void Config::load() {
   kv_get(CONFIG_KEY, (uint8_t*)&Config::data, sizeof(Config::data), 0);
 }
 
+/**
+ * @brief - writes the current config data to persistent storage from
+ * the config data structure
+ */
 void Config::save() {
   kv_set(CONFIG_KEY, (uint8_t*)&Config::data, sizeof(Config::data), 0);
 }
 
+/**
+ * @brief - resets the config data in persistent storage to its default vals
+ */
 void Config::reset() {
   kv_reset("/kv/");
   Config::data.restartCount = 0;
